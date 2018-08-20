@@ -56,53 +56,12 @@ heights[796]
 heights[918]
 #length(height_CSV$Height)
 #length(height_CSV$Participant)
-heights
+heights[1:10]
 ```
 
-```{r}
-# IGNORE THIS SECTION L... TESTING ... GOT IT TO WORK AS A FUNCTION BELOW
-# this grabs feet and inches correctly ... I need to make a function from it
-height_row_length <- length(height_CSV$Height)
-# height_row_length
-i <- 1
-while (i <= height_row_length)
-{
-  # print(i)
-  # first digit is easy ... just need to make sure it's a digit; use grepl(digitthing)
-  current_height <- height_CSV$Height[i]
-  # first_digit <- substring(current_height,1,1)
-  # print(first_digit)
-  # how to do second digit?
-  print(current_height[[1]])
-  # location_of_apostrophe <- regexpr(pattern="'",current_height)
-  # print(location_of_apostrophe)
-  # all of em' have an apostrophe in position 2, so I can grab 3-4 and figure it out later
-  second_block <- substring(current_height,3,4)
-  second_block_second_digit <- substring(second_block,2,2)
-  second_block_first_digit <- substring(second_block,1,1)
-  # print(second_block)
-  if (grepl("\\d",second_block_second_digit))
-  {
-    print("both digits triggered")
-    inches <- second_block
-  }
-  else if (grepl("\\d",second_block_first_digit))
-  {
-    print("first digit triggered")
-    inches <- substr(second_block,1,1)
-  }
-  else 
-  {
-    print("something else")
-  }
-  print(inches)
-  i <- i + 1
-}
-
-```
 
 ```{r}
-# function that returns feet and inches seperately
+# function that takes height (feet'inches") and returns meters
 return_meters <- function(height)
 {
   inches <- NA
@@ -116,17 +75,17 @@ return_meters <- function(height)
   {
     if (grepl("\\d",second_block_second_digit))
     {
-      print("both digits triggered")
+      #print("both digits triggered")
       inches <- second_block
     }
     else if (grepl("\\d",second_block_first_digit))
     {
-      print("first digit triggered")
+      #print("first digit triggered")
       inches <- substr(second_block,1,1)
     }
     else 
     {
-      print("something else")
+      #print("something else")
     }
   }
   feet_to_meters <- as.numeric(feet) * 0.3048
@@ -139,145 +98,80 @@ return_meters <- function(height)
 
 ```{r}
 i <- 1
-height_data_frame <- data.frame("Participant"=character(1),"Height"=character(1),stringsAsFactors=FALSE)
-while (i <= length(height_CSV$Height))
+participant_length <- length(height_CSV$Participant)
+height_length <- length(height_CSV$Height)
+height_list <- list()
+while(i <= participant_length)
 {
-  #print(height_CSV$Height[i])
-  #print(height_CSV$Height[i])
-  #print(return_meters(height_CSV$Height[i]))
-  current_participant <- height_CSV$Participant[i]
+  #print(i)
+  current_participant <- as.character(height_CSV$Participant[i])
   current_height <- return_meters(height_CSV$Height[i])
-  if (is.na(current_height))
-  {
-    
-  }
-  else
-  {
-    height_data_frame <- rbind(height_data_frame,list(current_participant,current_height))
-  }
+  height_list[[current_participant]] <- current_height
   i <- i + 1
 }
-height_data_frame
+height_list[1:10]
+# plot
+plot(unlist(height_list))
+# histogram
+hist(unlist(height_list))
+length(height_list)
+#length(unique(height_list))
 ```
 
 
 ```{r}
-
-# IGNORE THIS ... OLD, SHITTY HEIGHT METHOD
-# original attempt
-i <- 1
-#while (i <= 20)
-while (i <= length(height_CSV$Height))
+# function that returns gender
+returngender <- function(current_gender)
 {
-  #print(i)
-  current_participant <- height_CSV$Participant[i]
-  current_height <- height_CSV$Height[i]
-  # print(current_participant)
-  first_digit <- substr(current_height,1,1)
-  second_block <- substr(current_height,3,4)
-  # print(length(first_digit))
-  # print(current_height)
-  # if first digit has a number (heights[89] is a blank)
-  if (grepl("\\d",first_digit))
-  {
-    # print(second_block)
-    # three cases for 2nd digit: \ | # | ' |
-    second_block_digit1 <-second_block[1]
-    second_block_digit2 <- second_block[2]
-    if (grepl("\\d",second_block_digit2))
-    {
-      print("second block digit 2")
-      print(second_block)
-    }
-    else if (grepl("\\d",second_block_digit1))
-    {
-      print("second block digit 1")
-      print(second_block_digit1)
-    }
-  }
-  else {
-    print("not a number")
-    #print(first_digit)
-  }
-  i <- i + 1
-}
-```
-
-
-```{r}
-# get the right genders
-# there are 23 genders. I need to build a function that grabs usable labels
-# AND retains the correct participant names.
-# Female, Male, contains male, contains female, contains woman
-# levels(gender_CSV$Gender)
-# the row # for gender and participant are ==
-# length(gender_CSV$Gender)
-gender_length <- length(gender_CSV$Gender)
-# length(gender_CSV$Participant)
-gender_data_frame <- data.frame("Participant"=character(1), "Gender"=character(1),stringsAsFactors=FALSE)
-#gender_data_frame <- data.frame()
-i <- 1
-#j <- 1
-#gender_list <- list()
-#participant_list <- list()
-while (i <= gender_length)
-#while (i <= 30)
-{
-  #print(i)
-  current_gender <- as.character(gender_CSV$Gender[i])
-  #print(current_gender)
-  current_participant <- as.character(gender_CSV$Participant[i])
-  #print(current_participant)
   if (grepl("Female", current_gender))
   {
     #print("Female")
-    gender_data_frame <- rbind(gender_data_frame,list(current_participant,"Female"))
+    gender <- "Female"
   }
   else if (grepl("female", current_gender))
   {
     #print("Female")
-    gender_data_frame <- rbind(gender_data_frame,list(current_participant,"Female"))
+    gender <- "Female"
   }
   else if (grepl("woman", current_gender))
   {
     #print("Female")
-    gender_data_frame <- rbind(gender_data_frame,list(current_participant,"Female"))
+    gender <- "Female"
   }
   else if (grepl("Male", current_gender))
   {
     #print("Male")
-    gender_data_frame <- rbind(gender_data_frame,list(current_participant,"Male"))
+    gender <- "Male"
   }
   else if (grepl("male", current_gender))
   {
     #print("Male")
-    gender_data_frame <- rbind(gender_data_frame,list(current_participant,"Male"))
+    gender <- "Male"
   }
   else {
-    #print("Unknown gender")
+    gender <- NA
   }
-  i <- i + 1
+  return(gender)
 }
-gender_data_frame
-#typeof(gender_data_frame)
-#class(gender_data_frame)
-#typeof(gender_CSV$Participant)
-#class(gender_CSV$Participant)
-#typeof(gender_CSV$Gender)
-#class(gender_CSV$Gender)
 ```
 
 ```{r}
-# get UNIQUE gender and height AND THEN merge on Participant names
-gender_data_frame
-unique_gender_data_frame <- unique(gender_data_frame)   
-unique_gender_data_frame
-height_data_frame
-unique_height_data_frame <- unique(height_data_frame)
-unique_height_data_frame
-height_and_gender <- merge(unique_gender_data_frame, unique_height_data_frame, by="Participant")
-height_and_gender
+# get a list of genders
+i <- 1
+participant_length <- length(gender_CSV$Participant)
+gender_length <- length(gender_CSV$Gender)
+gender_list <- list()
+while (i <= gender_length)
+{
+  current_gender <- gender_CSV$Gender[i]
+  current_participant <- as.character(gender_CSV$Participant[i])
+  gender_list[[current_participant]] <- returngender(current_gender)
+  i <- i + 1
+}
+length(gender_list)
+gender_list[1:10]
 ```
+
 
 ```{r}
 # calculate the average heights for men and women
@@ -316,19 +210,5 @@ print(female_height_average)
 #print(female_count)
 ```
 
-```{r}
-# height_and_gender$Gender
-# plot(height_and_gender$Height[1:10], height_and_gender$Gender[1:10])
-heights <- as.vector(height_and_gender['Height'])
-genders <- as.vector(height_and_gender['Gender'])
 
-lengths(heights)
-typeof(heights)
-plot(heights)
-heights[1]
-hist(heights)
-#ncol(heights)
-lengths(genders)
-#ncol(genders)
-```
 
