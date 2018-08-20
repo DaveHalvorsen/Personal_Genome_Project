@@ -33,6 +33,10 @@ gender_CSV$Participant[1:20]
 # height_CSV$Height[1:20]
 # print('first 20 genders')
 # gender_CSV$Gender[1:20]
+height_CSV$Participant[1]
+gender_CSV$Participant[1]
+height_CSV$Height[1]
+gender_CSV$Gender[1]
 ```
 
 ```{r}
@@ -40,6 +44,7 @@ gender_CSV$Participant[1:20]
 # HOWEVER, the different formats need to be taken into account
 # looks like I'll need to create a function to clean this up
 # standard height
+heights <- height_CSV$Height
 heights[1]
 # double single quotes instead of double quotes
 heights[18]
@@ -93,12 +98,15 @@ while (i <= height_row_length)
   print(inches)
   i <- i + 1
 }
+
 ```
 
 ```{r}
 # function that returns feet and inches seperately
 return_meters <- function(height)
 {
+  inches <- NA
+  feet <- NA
   feet <- substring(height,1,1)
   
   second_block <- substring(height,3,4)
@@ -126,7 +134,7 @@ return_meters <- function(height)
   meters <- feet_to_meters + inches_to_meters
   return(meters)
 }
-print(return_meters(""))
+# print(return_meters("6'4"))
 ```
 
 ```{r}
@@ -139,14 +147,14 @@ while (i <= length(height_CSV$Height))
   #print(return_meters(height_CSV$Height[i]))
   current_participant <- height_CSV$Participant[i]
   current_height <- return_meters(height_CSV$Height[i])
-  if (is.na(current_height)){
+  if (is.na(current_height))
+  {
     
   }
   else
   {
     height_data_frame <- rbind(height_data_frame,list(current_participant,current_height))
   }
-  
   i <- i + 1
 }
 height_data_frame
@@ -154,6 +162,7 @@ height_data_frame
 
 
 ```{r}
+
 # IGNORE THIS ... OLD, SHITTY HEIGHT METHOD
 # original attempt
 i <- 1
@@ -196,9 +205,10 @@ while (i <= length(height_CSV$Height))
 
 
 ```{r}
+# get the right genders
 # there are 23 genders. I need to build a function that grabs usable labels
 # AND retains the correct participant names.
-# "Female", "Male", contains "male", contains "female", contains "woman"
+# Female, Male, contains male, contains female, contains woman
 # levels(gender_CSV$Gender)
 # the row # for gender and participant are ==
 # length(gender_CSV$Gender)
@@ -258,27 +268,19 @@ gender_data_frame
 ```
 
 ```{r}
-# height_CSV$Participant
-# height_CSV$Height
-height_DF <- data.frame("Participant" = height_CSV$Participant, "Height" = height_CSV$Height)
-height_DF
-gender_DF <- unique(height_DF)
-
-# gender_CSV$Participant
-# gender_CSV$Gender
-#gender_DF <- data.frame(Participant = gender_CSV$Participant, Gender = gender_CSV$Gender)
-#gender_DF
-gender_DF <- unique(gender_data_frame)
-gender_DF
-```
-
-```{r}
-#height_data_frame
-height_and_gender <- merge(gender_DF, height_data_frame, by="Participant")
+# get UNIQUE gender and height AND THEN merge on Participant names
+gender_data_frame
+unique_gender_data_frame <- unique(gender_data_frame)   
+unique_gender_data_frame
+height_data_frame
+unique_height_data_frame <- unique(height_data_frame)
+unique_height_data_frame
+height_and_gender <- merge(unique_gender_data_frame, unique_height_data_frame, by="Participant")
 height_and_gender
 ```
 
 ```{r}
+# calculate the average heights for men and women
 i <- 1
 female_height_sum <- 0
 female_count <- 0
@@ -306,9 +308,27 @@ while (i <= length(height_and_gender$Gender))
 }
 male_height_average <- male_height_sum / male_count
 female_height_average <- female_height_sum / female_count
+print("male height average")
 print(male_height_average)
 #print(male_count)
+print("female height average")
 print(female_height_average)
 #print(female_count)
+```
+
+```{r}
+# height_and_gender$Gender
+# plot(height_and_gender$Height[1:10], height_and_gender$Gender[1:10])
+heights <- as.vector(height_and_gender['Height'])
+genders <- as.vector(height_and_gender['Gender'])
+
+lengths(heights)
+typeof(heights)
+plot(heights)
+heights[1]
+hist(heights)
+#ncol(heights)
+lengths(genders)
+#ncol(genders)
 ```
 
